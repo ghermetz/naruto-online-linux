@@ -1,0 +1,5 @@
+# Données locales — hors dépôt
+*.log
+venv/
+
+# (ce dépôt ne contient volontairement ni le jeu ni le launcher)
