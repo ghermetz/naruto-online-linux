@@ -9,6 +9,8 @@
 Ce projet est issu de [OS-fedora-gaming](https://github.com/ghermetz/OS-fedora-gaming) et fonctionne sur toute distribution qui a Wine (Fedora, Ubuntu/Debian, Arch, openSUSE).
 
 > ✅ **Validé le 10/10/2026** sur Fedora 43 KDE avec Wine 11 Staging, dans une VM avec et sans accélération 3D : le launcher démarre, la connexion fonctionne, le jeu charge à 100 %, le son et la souris fonctionnent.
+>
+> ✅ **Testé le 12/10/2026 sur un vrai PC** (Fedora 44, Wine 11 Staging, Radeon RX 7600 XT) avec l'installeur officiel 3.4.7.0 : installation complète, launcher et connexion avec le rendu graphique accéléré. Le chargement du jeu s'est arrêté à 14 % parce qu'un serveur du jeu refusait les connexions de ce réseau (voir *Dépannage*).
 
 ## Installation
 
@@ -20,7 +22,7 @@ Il vous faut Wine 9 ou plus récent et winetricks. Le script les installe s'ils 
 ```bash
 git clone https://github.com/ghermetz/naruto-online-linux.git
 cd naruto-online-linux
-./naruto-online.sh setup ~/Téléchargements/"Naruto Online_fr_v3.4.7.0.zip"   # une fois, ~30 min
+./naruto-online.sh setup ~/Téléchargements/"Naruto Online_fr_v3.4.7.0.zip"   # une fois, 5 à 30 min
 ```
 
 La source peut être :
@@ -31,8 +33,8 @@ Sans argument, `./naruto-online.sh setup` cherche tout seul dans vos Télécharg
 
 Le script fait quatre choses :
 1. Il crée un préfixe Wine dédié dans `~/.local/share/wineprefixes/naruto-online`.
-2. Il installe **.NET Framework 4.8** et `corefonts` avec winetricks. C'est l'étape longue.
-3. Il installe le jeu dans `~/Games/Naruto Online` : installation silencieuse de l'installeur officiel, ou copie du dossier Windows (lancé depuis une partition NTFS, le jeu est lent et provoque des verrous de fichiers).
+2. Il installe **.NET Framework 4.8** et `corefonts` avec winetricks. C'est l'étape longue (5 minutes sur un PC récent avec la fibre, jusqu'à 30 minutes ailleurs).
+3. Il installe le jeu. Avec l'installeur officiel, **une fenêtre s'ouvre : cliquez sur « Utiliser »**. L'installeur ne sait plus s'installer sans fenêtre (version 3.4.7.0) et choisit lui-même son dossier dans le préfixe Wine ; le script le relie à `~/Games/Naruto Online`. À la fin, le launcher s'ouvre tout seul ; fermez-le pour que le script termine. Avec un dossier Windows, le jeu est copié dans `~/Games/Naruto Online` (lancé depuis une partition NTFS, il est lent et provoque des verrous de fichiers).
 4. Il ajoute **« Naruto Online »** au menu des applications.
 
 ## Jouer
@@ -51,7 +53,8 @@ Le premier chargement du jeu est long, comme le signale le launcher lui-même.
 
 | Symptôme | Solution |
 |---|---|
-| Le chargement reste bloqué ou la page est blanche | `./naruto-online.sh clear-cache`, puis relancez le jeu (il faudra vous reconnecter) |
+| Le chargement du jeu reste bloqué (par exemple à 14 %) et recommence | Le jeu n'arrive pas à joindre un de ses serveurs : `debug.log`, dans le dossier du jeu, contient alors `IO_ERROR`. Vérifiez si le même serveur charge sous Windows ou sur un autre réseau ; essayez un autre serveur de jeu |
+| La page reste blanche | `./naruto-online.sh clear-cache`, puis relancez le jeu (il faudra vous reconnecter) |
 | « Préfixe incomplet » | Relancez `setup` : les étapes déjà faites sont sautées |
 | Tout recommencer | `./naruto-online.sh uninstall`, puis `setup` |
 | Voir les erreurs Wine | `WINEDEBUG=err+all ./naruto-online.sh run` |
@@ -62,7 +65,7 @@ Le premier chargement du jeu est long, comme le signale le launcher lui-même.
 - **Ruffle** : le jeu est une grosse application ActionScript 3 en dizaines de modules, qui se connecte en socket aux serveurs. C'est au-delà de ce que Ruffle sait faire de façon fiable.
 - **Bottles (Flatpak)** : il n'apporte rien ici, et son bac à sable complique l'usage de winetricks.
 
-**Rendu graphique** : quand Direct3D 11 n'est pas disponible via Wine, le Chromium du launcher bascule tout seul sur un autre mode de rendu, sans écran noir. Le cas d'une carte graphique récente, où Direct3D 11 est disponible, n'a pas encore été testé sur du vrai matériel. Si vous obtenez un écran noir, ouvrez une *issue*.
+**Rendu graphique** : quand Direct3D 11 n'est pas disponible via Wine, le Chromium du launcher bascule tout seul sur un autre mode de rendu, sans écran noir. Sur une vraie carte graphique (Radeon RX 7600 XT), Direct3D 11 via Wine fonctionne : le launcher et la page du jeu s'affichent normalement. Si vous obtenez un écran noir, ouvrez une *issue*.
 
 En dernier recours, une VM Windows (WinBoat, VirtualBox…) avec le launcher natif fonctionne toujours.
 
